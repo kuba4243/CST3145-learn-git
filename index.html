@@ -1,88 +1,126 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <script src="https://unpkg.com/vue@2.7.8/dist/vue.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <script src="https://unpkg.com/vue@2.7.8/dist/vue.js"></script>
 
-    <title>Pet Store App</title>
 
-    
+
+
 </head>
+
 <body>
   <div id="app">
     <header>
       <h1 v-text="sitename"></h1>
       <button v-on:click="showCheckout">
-        {{ itemsInTheCart }}
+        {{ lessonsInTheCart }}
         <span class="fa-solid fa-cart-shopping"></span>
         Checkout
       </button>
     </header>
 
+
     <main>
+
+
       <div v-if="showProduct">
+
         <figure>
           <img v-bind:src="product.image" style="width: 150px; height: auto;">
         </figure>
 
-        <h1 v-text="product.title"></h1>
-        <p v-text="product.description"></p>
-        <p>Price: {{product.price}}</p>
+        <h3 v-text="'Subject: ' + product.subject"></h3>
+        <h3 v-text="'Location: ' + product.location"></h3>
+        <h3>Price: £{{product.price}}</h3>
+        <h3>Spaces: {{product.availableSpace}}</h3>
 
-        <button v-on:click="addItemToTheCart" v-if="canAddToTheCart">Add to the Cart</button>
+        <button v-on:click="addLessonsToTheCart" v-if="canAddToTheCart">Add to the Cart</button>
 
         <div v-else>
           <button disabled>Add to the Cart</button>
-          You have added all the available items for this product in your cart
+          You have added all the available spaces for this lesson
         </div>
       </div>
 
       <div v-else>
+
         <h1>Welcome to the Checkout page</h1>
+
+        <p>
+          <strong>Name: </strong>
+          <input type="text" v-model="order.name">
+        </p>
+
+        <p>
+          <strong>Phone: </strong>
+          <input type="text" v-model="order.phone">
+        </p>
+
+          <h2> Order Reciept  </h2>
+          <p>
+          <strong>Name: </strong> {{order.name}}
+          </p>
+          <p>
+          <strong>phone: </strong> {{order.phone}}
+          </p>
+
+          <button v-on:click="submitCheckoutForm">Place Order</button>
+
+          
       </div>
     </main>
   </div>
-<script>
+  <script>
     let webstore = new Vue({
       el: "#app",
       data: {
-        sitename: "Pet Store App",
+        sitename: "Lessons Store App",
         showProduct: true,
         product: {
           id: 1001,
-          title: "Mathematics Class",
-          description: "A 25 pound bag of <em>irresistible</em>, organic goodness for your cat.",
-          price: 2000,
-          image: "images/Deus_mathematics.png",
-          availableInventory: 5
+          subject: "Mathematics",
+          location: "Bristol",
+          price: 100,
+          image: "images\\3471391 (1).png",
+          availableSpace: 5
         },
-        cart: []
+        cart: [],
+        order: {
+          name: "",
+          phone: "",
+        }
       },
       methods: {
-        showCheckout: function() {
+        showCheckout: function () {
           if (this.showProduct) {
             this.showProduct = false;
           } else {
             this.showProduct = true;
           }
         },
-        addItemToTheCart: function() {
+        addLessonsToTheCart: function () {
           this.cart.push(this.product.id);
+        },
+        submitCheckoutForm() {
+          alert(" Order Submitted ")
         }
       },
       computed: {
-        itemsInTheCart: function() {
+        lessonsInTheCart: function () {
           return this.cart.length || "";
         },
-        canAddToTheCart: function() {
-          return this.product.availableInventory > this.cart.length;
+        canAddToTheCart: function () {
+          return this.product.availableSpace > this.cart.length;
         }
       }
     })
   </script>
 </body>
+
 </html>
