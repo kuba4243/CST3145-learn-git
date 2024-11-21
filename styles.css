@@ -1,0 +1,157 @@
+/* General styles */
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f4f4f9;
+  color: #333;
+}
+
+/* Header styles */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #0078d7;
+  color: white;
+  padding: 1rem;
+}
+
+header h1 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+header button {
+  background-color: white;
+  color: #0078d7;
+  border: none;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 1rem;
+}
+
+header button:disabled {
+  background-color: #ddd;
+  cursor: not-allowed;
+}
+
+/* Main section */
+main {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 1rem;
+}
+
+.product-item {
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  width: 300px;
+  padding: 1rem;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.product-item h1 {
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.product-item figure img {
+  width: 100%;
+  height: auto;
+  margin-bottom: 1rem;
+}
+
+.product-item p {
+  margin: 0.5rem 0;
+  font-size: 1rem;
+}
+
+.product-item button {
+  background-color: #0078d7;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 1rem;
+  margin-top: 0.5rem;
+}
+
+.product-item button:disabled {
+  background-color: #ddd;
+  cursor: not-allowed;
+}
+
+.product-item span {
+  display: block;
+  margin-top: 0.5rem;
+  font-weight: bold;
+  color: #f00;
+}
+
+/* Sorting options */
+.sort-options {
+  margin: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.sort-options h3,
+.sort-options h4 {
+  margin: 0;
+}
+
+.sort-options select {
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 1rem;
+}
+
+/* Cart and checkout styles */
+.cart-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  padding: 0.5rem;
+  border-radius: 5px;
+  margin-bottom: 0.5rem;
+}
+
+.cart-item button {
+  background-color: #f00;
+  color: white;
+  border: none;
+  padding: 0.5rem;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.cart-item button:hover {
+  background-color: darkred;
+}
+
+input[type="text"],
+input[type="number"] {
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  width: 100%;
+  margin-top: 0.5rem;
+  font-size: 1rem;
+}
+
+button:disabled {
+  background-color: #ddd;
+  cursor: not-allowed;
+}
