@@ -5,199 +5,179 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <script src="https://unpkg.com/vue@2.7.8/dist/vue.js"></script>
-  <script src="product.js"></script>
-  <title>Lessons Store App</title>
+  <link rel="stylesheet" href="styles.css">
 
-
+  <title>After School App</title>
 </head>
 
 <body>
   <div id="app">
     <header>
-      <h1 v-text="sitename"></h1>
-      <button v-on:click="showCheckout" :disabled="showProduct && cart.length === 0">
+      <h1>{{ sitename }}</h1>
+      <button v-on:click="showCheckout" :disabled="totalLessonsInTheCart === 0 && showProduct">
         {{ totalLessonsInTheCart }}
         <span class="fa-solid fa-cart-shopping"></span>
-        Checkout
+        {{ showProduct ? 'Checkout' : 'Back to Lessons' }}
       </button>
     </header>
 
     <div v-if="showProduct">
+      <!-- Sorting Options -->
+      <div class="sort-options">
+        <h3>Sort by</h3>
+        <select v-model="sortOption">
+          <option value="subject">Subject</option>
+          <option value="location">Location</option>
+          <option value="price">Price</option>
+          <option value="availableSpace">Availability</option>
+        </select>
+
+        <h4>Order</h4>
+        <select v-model="sortDirection">
+          <option value="ascending">Ascending</option>
+          <option value="descending">Descending</option>
+        </select>
+      </div>
+
       <main>
-        <!-- Dropdown to select sorting field -->
-        <div style="width: 100%; display: flex; justify-content: center; margin-bottom: 20px;">
-          <div>
-            <label for="sortBy">Sort by:</label>
-            <select v-model="sortBy" id="sortBy">
-              <option value="subject">Subject</option>
-              <option value="location">Location</option>
-              <option value="price">Price</option>
-              <option value="availableSpace">Available Space</option>
-            </select>
-          </div>
-
-          <div style="margin-left: 20px;">
-            <label for="sortOrder">Order:</label>
-            <select v-model="sortOrder" id="sortOrder">
-              <option value="ascending">Ascending</option>
-              <option value="descending">Descending</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- Display products -->
-        <div v-for="product in sortedProducts" :key="product.id" class="product">
-
-          <h1 v-text="'Subject: ' + product.subject"></h1>
-
+        <div v-for="product in sortedProducts" :key="product.id" class="product-item">
+          <h1>Subject: {{ product.subject }}</h1>
           <figure>
-            <img v-bind:src="product.image" style="width: 150px; height: auto;">
+            <img :src="product.image" alt="Product Image" />
           </figure>
+          <p>Location: {{ product.location }}</p>
+          <p>Price: £{{ product.price.toFixed(2) }}</p>
+          <h3>Spaces: {{ itemsLeft(product) }}</h3>
 
-          <h3 v-text="'Location: ' + product.location"></h3>
-          <h3>Price: £{{ product.price.toFixed(2) }}</h3>
-          <h3>Spaces: {{ product.availableSpace }}</h3>
+          <!-- Add to Cart Button -->
+          <button v-if="itemsLeft(product) > 0" v-on:click="addLessonsToCart(product)">
+            Add to the Cart
+          </button>
+          <button v-else disabled>Add to the Cart</button>
 
-          <button v-if="canAddToCart(product)" v-on:click="addLessonsToTheCart(product)">Add to Cart</button>
-          <button v-else disabled>Add to Cart</button>
-
-          <span v-if="itemsLeft(product) === 0"> Sold out ! </span>
-          <span v-else-if="itemsLeft(product) < 5"> Only {{itemsLeft(product)}} left </span>
-          <span v-else> Buy now </span>
+          <span v-if="itemsLeft(product) === 0">Sold out!</span>
+          <span v-else-if="itemsLeft(product) < 5">Only {{ itemsLeft(product) }} left!</span>
+          <span v-else>Buy Now</span>
         </div>
       </main>
     </div>
 
-    <div v-else class="checkout-page">
-      <h1>Welcome to the Checkout page</h1>
+    <!-- Shopping Cart Page -->
+    <div v-else>
+      <h1>Shopping Cart</h1>
+      <div v-for="product in cartItems" :key="product.id" class="cart-item">
+        <span>{{ product.subject }} - £{{ product.price.toFixed(2) }}</span>
+        <button v-on:click="removeLessonFromCart(product)">Remove</button>
+      </div>
 
-      <p>
-        <strong>Name: </strong>
-        <input type="text" v-model.trim="order.name">
-      </p>
-
-      <p>
-        <strong>Phone: </strong>
-        <input type="text" v-model.trim="order.phone">
-      </p>
-
-      <h2>Order Receipt</h2>
+      <h2>Checkout</h2>
+      <p><strong>Name:</strong> <input type="text" v-model.trim="order.name" /></p>
+      <p><strong>Phone Number:</strong> <input type="number" v-model.trim="order.phonenumber" /></p>
+      <button @click="submitCheckoutForm" :disabled="!isFormValid">Place Order</button>
+      <h2>Order Information</h2>
       <p><strong>Name:</strong> {{ order.name }}</p>
-      <p><strong>Phone:</strong> {{ order.phone }}</p>
-
-      <h3>Your Lessons:</h3>
-      <ul>
-        <li v-for="(product, index) in cartProducts" :key="product.id">
-          {{ product.subject }} (£{{ product.price.toFixed(2) }})
-          <button v-on:click="removeFromCart(product, index)">Remove</button>
-        </li>
-      </ul>
-
-      <!-- Make sure the button is enabled if both name and phone are valid -->
-      <button v-on:click="submitCheckoutForm" :disabled="!order.name || !order.phone">Place Order</button>
+      <p><strong>Phone Number:</strong> {{ order.phonenumber }}</p>
     </div>
   </div>
-
-  <footer>
-    <p>&copy; 2024 Lessons Store</p>
-  </footer>
 
   <script>
     let webstore = new Vue({
       el: "#app",
       data: {
-        sitename: "Lessons Store App",
+        sitename: "After School App",
         showProduct: true,
-        products: products,
+        products: [], // Product list fetched from the backend
+
+        imagesBaseURL: "https://app-backend-1qjf.onrender.com/",
+        serverBaseURL: "https://app-backend-1qjf.onrender.com/",
+        productsURL: "collections/products",
+        ordersURL: "collections/orders",
+        testConsole: true,
+        showTestConsole: true,
         cart: [],
-        order: {
-          name: "",
-          phone: "",
-        },
-        sortBy: 'price',   // Default field to sort by
-        sortOrder: 'ascending',  // Default sorting order
+        order: { name: "", phonenumber: "" },
+        sortOption: 'price',
+        sortDirection: 'ascending',
+      },
+      created() {
+        fetch("http://localhost:3000/collections/products")
+          .then(response => response.json())
+          .then(data => { this.products = data; })
+          .catch(error => console.error("Error loading products:", error));
       },
       methods: {
         showCheckout() {
-          this.showProduct = !this.showProduct;  // Toggle between the lessons page and checkout page
+          this.showProduct = !this.showProduct;
         },
-        addLessonsToTheCart(product) {
-          this.cart.push(product.id);
+        addLessonsToCart(product) {
+          if (this.canAddToCart(product)) {
+            this.cart.push(product.id); // Add the product ID to the cart
+          }
         },
-        removeFromCart(product, index) {
-          // Remove the product from the cart by index
-          this.cart.splice(index, 1);
-
-          // Increase the available space of the product
-          product.availableSpace++;
+        removeLessonFromCart(product) {
+          const index = this.cart.indexOf(product.id);
+          if (index > -1) this.cart.splice(index, 1); // Remove product from the cart
         },
         submitCheckoutForm() {
-          // Validate name
-          if (!this.validateName()) {
-            alert("The Name must contain letters only!");
-            return;
-          }
+          const orderData = {
+            name: this.order.name,
+            phoneNumber: this.order.phonenumber,
+            lessonIDs: this.cart,
+          };
 
-          // Validate phone
-          if (!this.validatePhone()) {
-            alert("The Phone must contain numbers only!");
-            return;
-          }
-
-          // If both validations pass, submit the form
-          alert("Order Submitted Successfully!");
-
-          // Clear cart after submitting
-          this.cart = [];
-
-          // Clear the form fields
-          this.order.name = "";
-          this.order.phone = "";
-
-          // Return to the lessons page
-          this.showProduct = true;
-        },
-        validateName() {
-          const nameRegex = /^[a-zA-Z\s]+$/;
-          return nameRegex.test(this.order.name);
-        },
-        validatePhone() {
-          const phoneRegex = /^\d+$/;
-          return phoneRegex.test(this.order.phone);
-        },
-        canAddToCart(product) {
-          return product.availableSpace > this.cartCount(product.id);
-        },
-        cartCount(id) {
-          return this.cart.filter(productId => productId === id).length;
+          fetch("http://localhost:3000/collections/orders", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(orderData),
+          })
+            .then(response => response.json())
+            .then(data => {
+              if (data.message) {
+                alert("Order placed successfully!");
+                this.cart = [];
+                this.order.name = '';
+                this.order.phonenumber = '';
+                this.showCheckout();
+              } else {
+                alert("Failed to place order. Try again.");
+              }
+            })
+            .catch(error => console.error("Error:", error));
         },
         itemsLeft(product) {
-          return product.availableSpace - this.cartCount(product.id);
-        }
+          const spacesLeft = product.availableSpace - this.cartCount(product.id);
+          return spacesLeft < 0 ? 0 : spacesLeft;
+        },
+        canAddToCart(product) {
+          return this.itemsLeft(product) > 0;
+        },
+        cartCount(productId) {
+          return this.cart.filter(id => id === productId).length;
+        },
       },
       computed: {
         totalLessonsInTheCart() {
-          return this.cart.length || "";
+          return this.cart.length;
+        },
+        cartItems() {
+          return this.products.filter(product => this.cart.includes(product.id));
         },
         sortedProducts() {
           const sorted = [...this.products];
           sorted.sort((a, b) => {
-            let modifier = this.sortOrder === 'ascending' ? 1 : -1;
-            if (this.sortBy === 'price' || this.sortBy === 'availableSpace') {
-              return (a[this.sortBy] - b[this.sortBy]) * modifier;
-            } else {
-              return a[this.sortBy].localeCompare(b[this.sortBy]) * modifier;
-            }
+            let modifier = this.sortDirection === "ascending" ? 1 : -1;
+            return (a[this.sortOption] > b[this.sortOption] ? 1 : -1) * modifier;
           });
           return sorted;
         },
-        cartProducts() {
-          return this.cart.map(id => this.products.find(product => product.id === id));
-        }
-      }
+        isFormValid() {
+          const validName = /^[A-Za-z\s]+$/.test(this.order.name.trim());
+          const validPhone = /^\d+$/.test(this.order.phonenumber.trim()) && this.order.phonenumber.trim().length >= 10;
+          return validName && validPhone;
+        },
+      },
     });
   </script>
 </body>
