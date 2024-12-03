@@ -95,7 +95,7 @@
         sitename: "After School App",
         showProduct: true,
         products: [],
-        serverBaseURL: "https://app-backend-1qjf.onrender.com/",
+        serverBaseURL: "https://app-backend-1qjf.onrender.com/", // back end connection
         searchQuery: '', // For the search functionality
         cart: [],
         order: { name: "", phonenumber: "" },
@@ -107,7 +107,7 @@
       },
       methods: {
         fetchLessons() {
-          fetch(this.serverBaseURL + `collections/products`)
+          fetch(this.serverBaseURL + `collections/products`) // fetch lesons from the API
             .then(response => {
               if (!response.ok) {
                 throw new Error("Failed to fetch lessons");
@@ -149,7 +149,7 @@
         submitCheckoutForm() {
           const orderData = {
             name: this.order.name,
-            phoneNumber: this.order.phonenumber,
+            phone: this.order.phonenumber,
             lessonIDs: this.cart,
           };
 
